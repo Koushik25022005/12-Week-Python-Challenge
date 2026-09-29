@@ -4,13 +4,12 @@ import ctypes
 
 class DynamicArray(object):
     """Creates a dynaimc array using fixed size C arrays abstractly"""
-    def __init__(self, initial_capacity: int = 1) -> None:
+    def __init__(self, initial_capacity: int = 1):
         if initial_capacity < 1:
-            raise ValueError("Initial Capacity must be atleast 1")
-        
+            raise ValueError("Capacity must be atleast 1")
         self._size: int = 0
         self._capacity: int = 1
-        self._array: ctypes.Array = self._make_array(self._capacity)
+        self._array: ctypes.Array = self._make_array(self._capacity)   
         
     def __len__(self) -> int:
         return self._size
@@ -18,7 +17,7 @@ class DynamicArray(object):
     def __getitem__(self, index: int) -> Any:
         index = self._validate_and_normalize_index(index)
         return self._array[index]
-    
+         
     def __setitem__(self, index: int, value: Any) -> None:
         index = self._validate_and_normalize_index(index)
         self._array[index] = value
@@ -28,7 +27,7 @@ class DynamicArray(object):
             yield self._array[i]
             
     def __repr__(self) -> str:
-        elements =",".join(repr(self._array[i]) for i in range(self._size))
+        elements = ','.join(repr(self._array[i]) for i in range(self._size))
         return f"DynamicArray([{elements}])"
     
     @property
@@ -36,27 +35,27 @@ class DynamicArray(object):
     def capacity(self) -> int:
         return self._capacity
     
-    def pop(self, index: Optional[int] = None) -> Any:
+    def pop(self, index: Optional[Any] = None) -> Any:
         if self._size == 0:
-            raise IndexError("pop from empty DynamicError")
+            raise IndexError("pop from empty DynamicArray")
         
         if index is None:
-            index = self._size-1
+            index = self._size
         else:
-            index=self._validate_and_normalize_index(index)
+            index = self._validate_and_normalize_index(index)
             
         item = self._array[index]
-        
-        # Shift elements to left
+        # shift elements to the left
         for i in range(self._size):
             self._array[i] = self._array[i+1]
             
-        self._array[self._size-1] = None
-        # Shrink capacity if array is 1/4 full to prevent thrashing
-        if 0 < self._size <= self._capacity // 4 and self._capacity //2 >1:
-            self._resize(self._capacity // 2)
+        self._array[self._size-1] = None # clear garbage reference
             
+        self._size -= 1
+        if 0 < self._size <= self._capacity//4 and self._capacity > 1:
+            self._resize(self._capacity//2)
         return item
+    
     def insert(self, item: Any, index: int) -> None:
         if self._size == self._capacity:
             self._resize(self._capacity * 2)
