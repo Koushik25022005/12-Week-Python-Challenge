@@ -8,7 +8,7 @@ class DynamicArray(object):
         if initial_capacity < 1:
             raise ValueError("Capacity must be atleast 1")
         self._size: int = 0
-        self._capacity: int = 1
+        self._capacity: int = initial_capacity
         self._array: ctypes.Array = self._make_array(self._capacity)   
         
     def __len__(self) -> int:
@@ -40,23 +40,23 @@ class DynamicArray(object):
             raise IndexError("pop from empty DynamicArray")
         
         if index is None:
-            index = self._size
+            index = self._size - 1
         else:
             index = self._validate_and_normalize_index(index)
             
         item = self._array[index]
         # shift elements to the left
-        for i in range(self._size):
+        for i in range(index, self._size-1):
             self._array[i] = self._array[i+1]
             
         self._array[self._size-1] = None # clear garbage reference
-            
         self._size -= 1
-        if 0 < self._size <= self._capacity//4 and self._capacity > 1:
+        
+        if 0 < self._size <= self._capacity//4:
             self._resize(self._capacity//2)
         return item
     
-    def insert(self, item: Any, index: int) -> None:
+    def insert(self, index: int, item: Any) -> None:
         if self._size == self._capacity:
             self._resize(self._capacity * 2)
             
@@ -66,7 +66,7 @@ class DynamicArray(object):
             index = max(0, self._size+index)
             
         # shift elements to the right
-        for i in range(self._size):
+        for i in range(self._size, index, -1):
             self._array[i] = self._array[i-1]
             
         self._array[index] = item
@@ -81,7 +81,7 @@ class DynamicArray(object):
         
     def _resize(self, new_capacity: int) -> None:
         new_array = self._make_array(new_capacity)
-        for i in range(new_capacity):
+        for i in range(self._size):
             new_array[i] = self._array[i]
             
         self._capacity = new_capacity
