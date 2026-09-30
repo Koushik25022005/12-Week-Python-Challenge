@@ -95,13 +95,7 @@ class DynamicArray(object):
             index += self._size
             
         if not (0<= index < self._size):
-            raise IndexError("INdex out of bounds")
+            raise IndexError("Index out of bounds")
 
         return index        
-            
-        
-                
-        
-        
-        
             
